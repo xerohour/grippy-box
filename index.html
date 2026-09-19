@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keep Notes - Google Keep Clone</title>
+    <meta name="description" content="Grippy Box — a lightweight Google Keep clone for capturing notes with color coding, pinning, and search.">
+    <meta name="theme-color" content="#ff6d00">
+    <meta property="og:title" content="Grippy Box — Keep Notes">
+    <meta property="og:description" content="A simple, fast note-taking app inspired by Google Keep.">
+    <meta property="og:type" content="website">
+    <title>Grippy Box — Keep Notes</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💡</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -18,18 +24,126 @@
             --note-bg: #fff;
             --header-bg: #fff;
             --border-color: #e0e0e0;
+            --text-primary: #202124;
+            --text-secondary: #3c4043;
+            --text-muted: #5f6368;
             --shadow: 0 1px 2px 0 rgba(60,64,67,.302), 0 1px 3px 1px rgba(60,64,67,.149);
             --hover-shadow: 0 1px 2px 0 rgba(60,64,67,.302), 0 2px 6px 2px rgba(60,64,67,.149);
             --light-blue: #d2e3fc;
             --light-green: #d4edda;
             --light-yellow: #fff3cd;
             --light-pink: #f8d7da;
+            --accent: #ff6d00;
+            --save-btn-bg: #007bff;
+            --save-btn-hover: #0056b3;
+            --dialog-overlay: rgba(0,0,0,0.5);
+            --dialog-bg: #fff;
+            --dialog-border: #e0e0e0;
+            --focus-ring: 2px solid #1a73e8;
+            --focus-offset: 2px;
+            --confirm-delete-bg: #dc3545;
+            --confirm-delete-hover: #c82333;
+            --confirm-cancel-bg: #6c757d;
+            --confirm-cancel-hover: #5a6268;
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #202124;
+                --note-bg: #2d2e30;
+                --header-bg: #2d2e30;
+                --border-color: #5f6368;
+                --text-primary: #e8eaed;
+                --text-secondary: #bdc1c6;
+                --text-muted: #9aa0a6;
+                --shadow: 0 1px 2px 0 rgba(0,0,0,.5), 0 1px 3px 1px rgba(0,0,0,.3);
+                --hover-shadow: 0 1px 2px 0 rgba(0,0,0,.5), 0 2px 6px 2px rgba(0,0,0,.3);
+                --light-blue: #1a3a5c;
+                --light-green: #1a3c2a;
+                --light-yellow: #3c3a1a;
+                --light-pink: #3c1a22;
+                --save-btn-bg: #8ab4f8;
+                --save-btn-hover: #aecbfa;
+                --dialog-overlay: rgba(0,0,0,0.7);
+                --dialog-bg: #2d2e30;
+                --dialog-border: #5f6368;
+                --focus-ring: 2px solid #8ab4f8;
+                --confirm-delete-bg: #f28b82;
+                --confirm-delete-hover: #fca5a0;
+                --confirm-cancel-bg: #9aa0a6;
+                --confirm-cancel-hover: #bdc1c6;
+            }
+
+            .search-container input {
+                background: #3c4043;
+                color: #e8eaed;
+                border-color: #5f6368;
+            }
+
+            .note-actions button,
+            .add-note i,
+            .add-note p {
+                color: #9aa0a6;
+            }
+
+            .note-actions button:hover {
+                background-color: rgba(255,255,255,0.1);
+            }
+
+            .dialog-input {
+                background: transparent;
+                color: #e8eaed;
+            }
+
+            .dialog-close-btn {
+                color: #9aa0a6;
+            }
+
+            #save-note {
+                color: #202124;
+            }
+
+            .color-option.white {
+                background-color: #2d2e30;
+            }
         }
 
         body {
             background-color: var(--primary-color);
             min-height: 100vh;
             padding-bottom: 40px;
+        }
+
+        /* Skip link for accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 9999;
+            font-size: 14px;
+            border-radius: 0 0 4px 0;
+            transition: top 0.2s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+            outline: var(--focus-ring);
+            outline-offset: var(--focus-offset);
+        }
+
+        /* Focus visible for all interactive elements */
+        *:focus-visible {
+            outline: var(--focus-ring);
+            outline-offset: var(--focus-offset);
+        }
+
+        /* Remove focus outline on main content (only targeted by skip link) */
+        main:focus-visible {
+            outline: none;
         }
 
         header {
@@ -56,14 +170,14 @@
         }
 
         .logo i {
-            color: #ff6d00;
+            color: var(--accent);
             font-size: 28px;
         }
 
         .logo h1 {
             font-size: 22px;
             font-weight: 500;
-            color: #5f6368;
+            color: var(--text-muted);
         }
 
         .search-container {
@@ -77,9 +191,10 @@
             padding: 12px 16px 12px 40px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
-            background: #f1f3f4;
+            background: var(--primary-color);
             font-size: 16px;
             outline: none;
+            color: var(--text-primary);
         }
 
         .search-container i {
@@ -87,10 +202,10 @@
             left: 12px;
             top: 50%;
             transform: translateY(-50%);
-            color: #5f6368;
+            color: var(--text-muted);
         }
 
-        .main-container {
+        main {
             max-width: 1200px;
             margin: 30px auto;
             padding: 0 20px;
@@ -114,19 +229,20 @@
             flex-direction: column;
         }
 
-        .add-note:hover {
+        .add-note:hover,
+        .add-note:focus-visible {
             box-shadow: var(--hover-shadow);
         }
 
         .add-note i {
             font-size: 24px;
-            color: #5f6368;
+            color: var(--text-muted);
             align-self: flex-start;
         }
 
         .add-note p {
             margin-top: 10px;
-            color: #5f6368;
+            color: var(--text-muted);
             font-size: 16px;
         }
 
@@ -157,12 +273,12 @@
             font-size: 18px;
             font-weight: 500;
             margin-bottom: 8px;
-            color: #202124;
+            color: var(--text-primary);
         }
 
         .note-content {
             font-size: 14px;
-            color: #3c4043;
+            color: var(--text-secondary);
             line-height: 1.5;
             flex-grow: 1;
             white-space: pre-wrap;
@@ -182,7 +298,8 @@
             transition: opacity 0.2s;
         }
 
-        .note-card:hover .note-actions {
+        .note-card:hover .note-actions,
+        .note-card:focus-within .note-actions {
             opacity: 1;
         }
 
@@ -190,7 +307,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            color: #5f6368;
+            color: var(--text-muted);
             font-size: 16px;
             padding: 4px;
             border-radius: 4px;
@@ -210,37 +327,241 @@
             transition: opacity 0.2s;
         }
 
-        .note-card:hover .color-picker {
+        .note-card:hover .color-picker,
+        .note-card:focus-within .color-picker {
             opacity: 1;
         }
 
         .color-option {
+            appearance: none;
+            -webkit-appearance: none;
+            background: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
+            padding: 0;
+            font-size: 0;
+            line-height: 0;
         }
 
         .color-option.active {
-            border-color: #5f6368;
+            border-color: var(--text-muted);
         }
 
         .blue { background-color: var(--light-blue); }
         .green { background-color: var(--light-green); }
         .yellow { background-color: var(--light-yellow); }
         .pink { background-color: var(--light-pink); }
-        .white { background-color: #fff; }
+        .white { background-color: var(--note-bg); }
 
         .pinned {
-            border-left: 3px solid #ff6d00;
+            border-left: 3px solid var(--accent);
+        }
+
+        /* Note dialog (edit/add) */
+        .note-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dialog-overlay);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .dialog-content {
+            background: var(--dialog-bg);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .dialog-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--dialog-border);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .dialog-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            line-height: 1;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .dialog-close-btn:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .dialog-body {
+            padding: 16px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: transparent;
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .dialog-textarea {
+            width: 100%;
+            height: 200px;
+            border: none;
+            resize: none;
+            outline: none;
+            font-size: 16px;
+            padding: 8px;
+            font-family: inherit;
+            background: transparent;
+            color: var(--text-primary);
+        }
+
+        .dialog-footer {
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--dialog-border);
+        }
+
+        .color-options {
+            display: flex;
+            gap: 8px;
+        }
+
+        .color-options .color-option {
+            width: 24px;
+            height: 24px;
+        }
+
+        .color-options .color-option.active {
+            border-color: var(--text-muted);
+        }
+
+        #save-note {
+            background: var(--save-btn-bg);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        #save-note:hover {
+            background: var(--save-btn-hover);
+        }
+
+        /* Delete confirmation dialog */
+        .confirm-dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dialog-overlay);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+        }
+
+        .confirm-dialog-content {
+            background: var(--dialog-bg);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            overflow: hidden;
+            padding: 24px;
+        }
+
+        .confirm-dialog-content h3 {
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            font-size: 18px;
+        }
+
+        .confirm-dialog-content p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .confirm-dialog-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .confirm-dialog-actions button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel {
+            background: var(--confirm-cancel-bg);
+            color: #fff;
+        }
+
+        .btn-cancel:hover {
+            background: var(--confirm-cancel-hover);
+        }
+
+        .btn-delete {
+            background: var(--confirm-delete-bg);
+            color: #fff;
+        }
+
+        .btn-delete:hover {
+            background: var(--confirm-delete-hover);
+        }
+
+        /* Screen reader only */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
         }
 
         @media (max-width: 768px) {
             .notes-grid {
                 grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             }
-            
+
             .logo h1 {
                 display: none;
             }
@@ -250,7 +571,7 @@
             .notes-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .search-container {
                 display: none;
             }
@@ -258,32 +579,34 @@
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header>
         <div class="header-content">
             <div class="logo">
-                <i class="fas fa-lightbulb"></i>
+                <i class="fas fa-lightbulb" aria-hidden="true"></i>
                 <h1>Keep Notes</h1>
             </div>
             <div class="search-container">
-                <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Search notes...">
+                <i class="fas fa-search" aria-hidden="true"></i>
+                <input type="search" id="search-input" placeholder="Search notes..." aria-label="Search notes">
             </div>
         </div>
     </header>
 
-    <div class="main-container">
-        <div class="notes-grid">
+    <main id="main-content" tabindex="-1">
+        <div class="notes-grid" role="feed" aria-label="Notes">
             <!-- Add Note Card -->
-            <div class="add-note" id="add-note-btn">
-                <i class="fas fa-plus"></i>
+            <button class="add-note" id="add-note-btn" aria-label="Add a new note">
+                <i class="fas fa-plus" aria-hidden="true"></i>
                 <p>Take a note...</p>
-            </div>
-            
+            </button>
             <!-- Notes will be dynamically added here -->
         </div>
-    </div>
+    </main>
+
+    <!-- Live region for screen reader announcements -->
+    <div id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <script src="script.js"></script>
 </body>
 </html>
-
